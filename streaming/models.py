@@ -2,9 +2,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
 class SubscriptionPlan(models.Model):
     name = models.CharField(max_length=100)
     price = models.PositiveIntegerField()
+
     def __str__(self) -> str:
         return f'{self.name}: {self.price/100}€'
 
@@ -18,22 +20,36 @@ GENRE_CHOICES = (
     ('Act', 'Action')
 )
 
+
 class Movie(models.Model):
     title = models.CharField(max_length=100)
     genre = models.CharField(choices=GENRE_CHOICES, max_length=3)
-    subscription_plans = models.ManyToManyField(SubscriptionPlan, related_name='movies')
+    subscription_plans = models.ManyToManyField(
+        SubscriptionPlan, related_name='movies')
+
+    def average_rating(self):
+        return round(self.reviews.aggregate(models.Avg('rating'))['rating__avg'])
+
+    def rating_count(self):
+        return self.reviews.count()
+
     def __str__(self) -> str:
         return self.title
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    subscription_plan = models.ForeignKey(SubscriptionPlan, null=True, blank=True, on_delete=models.CASCADE, related_name='users')
+    subscription_plan = models.ForeignKey(
+        SubscriptionPlan, null=True, blank=True, on_delete=models.CASCADE, related_name='users')
+
 
 class Review(models.Model):
     rating = models.SmallIntegerField()
     comment = models.TextField()
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='reviews')
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name='reviews')
+    movie = models.ForeignKey(
+        Movie, on_delete=models.CASCADE, related_name='reviews')
 
     def clean(self) -> None:
         super(Review, self).clean()

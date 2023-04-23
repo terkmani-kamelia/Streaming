@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Plan movies</title>
+  </head>
+  <body>
+    <h1>Movies from subscription plan {{ subscription_id }}</h1>
+    {% for movie in movies %}
+    <div class="movie">
+      <h2>{{ movie.title }}</h2>
+
+      <p>genre: {{ movie.genre}}</p>
+    </div>
+    {% empty %}
+    <p>No movies found.</p>
+    {% endfor %}
+  </body>
+</html>
